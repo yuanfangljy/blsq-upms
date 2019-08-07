@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.blsq.admin.mapper.SysOrgMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.blsq.admin.model.SysOrg">
+        <id column="org_id" property="orgId" />
+        <result column="user_id" property="userId" />
+        <result column="org_name" property="orgName" />
+        <result column="org_code" property="orgCode" />
+        <result column="sort" property="sort" />
+        <result column="parent_id" property="parentId" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="del_flag" property="delFlag" />
+        <result column="tenant_id" property="tenantId" />
+        <result column="version" property="version" />
+    </resultMap>
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMapOrgVO" type="com.blsq.admin.common.vo.OrgVO">
+        <id column="org_id" property="orgId" />
+        <result column="user_id" property="userId" />
+        <result column="username" property="username" />
+        <result column="org_name" property="orgName" />
+        <result column="org_code" property="orgCode" />
+        <result column="sort" property="sort" />
+        <result column="parent_id" property="parentId" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="del_flag" property="delFlag" />
+        <result column="tenant_id" property="tenantId" />
+        <result column="version" property="version" />
+    </resultMap>
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMapOrgDetailsVO" type="com.blsq.admin.common.vo.OrgVO">
+        <id column="org_id" property="orgId" />
+        <result column="user_id" property="userId" />
+        <result column="username" property="username" />
+        <result column="org_name" property="orgName" />
+        <result column="org_code" property="orgCode" />
+        <result column="sort" property="sort" />
+        <result column="parent_id" property="parentId" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="del_flag" property="delFlag" />
+        <result column="tenant_id" property="tenantId" />
+        <result column="version" property="version" />
+        <collection property="roleList" ofType="com.blsq.admin.common.vo.SysRoleVO">
+            <id column="role_id" property="roleId" />
+            <result column="role_name" property="roleName" />
+        </collection>
+        <collection property="selectedHouseList" ofType="com.blsq.admin.common.vo.HouseVO">
+            <result column="id" property="id"/>
+        </collection>
+
+
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        so.org_id ,so.user_id ,so.org_name ,so.org_code ,so.sort ,so.parent_id ,
+         so.create_time ,so.update_time ,so.del_flag ,so.tenant_id ,so.version
+    </sql>
+
+    <!--根据组织ID，查询相应组织详情-->
+    <select id="selectOrgWithUserByIdList" resultMap="BaseResultMapOrgVO">
+        select
+          <include refid="Base_Column_List"/>,su.username
+        from sys_org as so left JOIN sys_user as su ON
+        so.user_id = su.user_id
+        WHERE so.del_flag!=1 and so.parent_id=#{orgDTO.orgId}
+    </select>
+
+    <select id="selectOrgByParentId" resultMap="BaseResultMap">
+        select * from sys_org where parent_id=#{orgId} and del_flag=0
+    </select>
+
+    <!--根据组织ID,查询当前组织以及所有下级组织的信息-->
+    <select id="selectOrgDescendantList" resultMap="BaseResultMap">
+       SELECT <include refid="Base_Column_List"/> FROM sys_org AS so,sys_org_relation AS re
+       WHERE so.`org_id`=re.`descendant` AND re.`ancestor`=#{orgId}
+    </select>
+
+    <select id="selectOrgPage" resultMap="BaseResultMapOrgVO">
+        SELECT <include refid="Base_Column_List"/>,u.username
+        FROM sys_org AS so
+        LEFT JOIN sys_org_relation AS re ON so.`org_id`=re.`descendant`
+        LEFT JOIN sys_user AS u ON u.`user_id`=so.`user_id`
+        WHERE re.`ancestor`=#{orgDTO.orgId}
+    </select>
+
+    <sql id="orgDetailsSql">
+        so.org_id,
+        so.user_id,
+        so.org_name,
+        so.org_code,
+        so.sort,
+        so.parent_id,
+        so.create_time,
+        so.update_time,
+        so.del_flag,
+        oh.house_id as id,
+        r.role_id,
+        r.role_name
+    </sql>
+
+    <select id="selectOrgDetailsById" resultMap="BaseResultMapOrgDetailsVO">
+        SELECT <include refid="orgDetailsSql"/> FROM
+      sys_org AS so
+      LEFT JOIN sys_org_house AS oh ON so.`org_id`=oh.`org_id`
+      LEFT JOIN sys_org_role AS oro ON so.`org_id`=oro.`org_id`
+      LEFT JOIN sys_role AS r ON r.`role_id`=oro.`role_id`
+      WHERE so.`org_id`= #{orgId}
+    </select>
+
+</mapper>

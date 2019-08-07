@@ -1,0 +1,71 @@
+#eureka:
+#  client:
+#    service-url:
+#      defaultZone: http://127.0.0.1:8001/eureka/
+server:
+  port: 54321
+
+spring:
+  application:
+    name: admin
+  profiles:
+    active: dev
+  redis:
+    database: 0
+    host: 39.108.101.235
+    port: 6379
+    password: kl2019
+#  redis:
+#    database: 0
+#    host: 127.0.0.1
+#    port: 6379
+#    password: 123456
+
+# 数据源
+#  datasource:
+#    type: com.zaxxer.hikari.HikariDataSource
+#    driver-class-name: com.mysql.jdbc.Driver
+#    username: root
+#    password: 123456
+#    url: jdbc:mysql://127.0.0.1:3306/sys_blsq?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2B8&allowMultiQueries=true
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: Mysql@tfq2609
+    url: jdbc:mysql://39.108.101.235:3306/sys_blsq?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2B8&allowMultiQueries=true
+
+
+# mybaits-plus配置
+mybatis-plus:
+  # MyBatis Mapper所对应的XML文件位置
+  mapper-locations: classpath:/mapper/*Mapper.xml
+  global-config:
+    # 关闭MP3.0自带的banner
+    banner: false
+    db-config:
+      # 主键类型 0:数据库ID自增 1.未定义 2.用户输入 3 id_worker 4.uuid 5.id_worker字符串表示
+      id-type: 0
+      #字段策略 0:"忽略判断",1:"非 NULL 判断"),2:"非空判断"
+      field-strategy: 1
+      # 默认数据库表下划线命名
+      table-underline: true
+      # 逻辑已删除值(默认为 1)
+      logic-delete-value: 1
+      # 逻辑未删除值(默认为 0)
+      logic-not-delete-value: 0
+  configuration:
+    map-underscore-to-camel-case: true
+
+
+# Logger Config
+logging:
+  level:
+    com.blsq.admin.mapper: info
+
+
+security:
+  jwt:
+    auth-parameters:
+      jwtTokenSecret: blsq-sys
+      tokenExpiredMs: 604800000

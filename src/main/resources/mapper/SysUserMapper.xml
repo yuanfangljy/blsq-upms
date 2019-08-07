@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.blsq.admin.mapper.SysUserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.blsq.admin.model.SysUser">
+        <id column="user_id" property="userId" />
+        <result column="username" property="username" />
+        <result column="password" property="password" />
+        <result column="salt" property="salt" />
+        <result column="phone" property="phone" />
+        <result column="avatar" property="avatar" />
+        <result column="dept_id" property="deptId" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="lock_flag" property="lockFlag" />
+        <result column="del_flag" property="delFlag" />
+        <result column="wx_openid" property="wxOpenid" />
+        <result column="qq_openid" property="qqOpenid" />
+        <result column="tenant_id" property="tenantId" />
+        <result column="version" property="version" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        user_id, username, password, salt, phone, avatar, dept_id, create_time, update_time, lock_flag, del_flag, wx_openid, qq_openid, tenant_id, version
+    </sql>
+
+    <sql id="selectUserVo">
+        SELECT
+        `user`.user_id,
+        `user`.username,
+        `user`.`password`,
+        `user`.salt,
+        `user`.phone,
+        `user`.avatar,
+        `user`.dept_id,
+        `user`.create_time AS ucreate_time,
+        `user`.update_time AS uupdate_time,
+        `user`.del_flag AS udel_flag,
+        `user`.lock_flag AS ulock_flag,
+        r.role_id,
+        r.role_name,
+        r.role_code,
+        r.role_desc,
+        r.create_time AS rcreate_time,
+        r.update_time AS rupdate_time
+        FROM
+        sys_user AS `user`
+        LEFT JOIN sys_role AS r ON r.role_id = ur.role_id
+    </sql>
+
+    <!-- 通用   userVo结果集 wwwwwwwwwww-->
+    <resultMap id="userVoResultMap" type="com.blsq.admin.common.vo.UserVO">
+        <id column="user_id" property="userId"/>
+        <result column="username" property="username"/>
+        <result column="identity_card" property="identityCard"/>
+        <result column="salt" property="salt"/>
+        <result column="realname" property="realname" />
+        <result column="mailbox" property="mailbox" />
+        <result column="phone" property="phone" />
+        <result column="avatar" property="avatar" />
+        <result column="ucreate_time" property="createTime"/>
+        <result column="uupdate_time" property="updateTime"/>
+        <result column="udel_flag" property="delFlag"/>
+        <result column="ulock_flag" property="lockFlag"/>
+        <result column="dept_id" property="deptId"/>
+        <result column="dept_name" property="deptName"/>
+        <collection property="roleList" ofType="com.blsq.admin.common.vo.SysRoleVO">
+            <id column="role_id" property="roleId" />
+            <result column="role_name" property="roleName" />
+            <result column="role_code" property="roleCode" />
+            <result column="role_desc" property="roleDesc" />
+        </collection>
+        <collection property="org" ofType="com.blsq.admin.model.SysOrg">
+            <id column="org_id" property="orgId" />
+            <result column="org_name" property="orgName" />
+            <result column="org_code" property="orgCode" />
+        </collection>
+    </resultMap>
+    <sql id="userRoleDeptSql">
+        `user`.user_id,
+        `user`.username,
+        `user`.`password`,
+        user.realname,
+        `user`.salt,
+        `user`.phone,
+        user.avatar,
+        user.mailbox,
+        user.identity_card,
+        `user`.wx_openid,
+        `user`.qq_openid,
+        `user`.create_time AS ucreate_time,
+        `user`.update_time AS uupdate_time,
+        `user`.del_flag AS udel_flag,
+        `user`.lock_flag AS lock_flag,
+        `user`.tenant_id AS tenantId,
+        r.role_id,
+        r.role_name,
+        r.role_code,
+        r.role_desc,
+        r.create_time AS rcreate_time,
+        r.update_time AS rupdate_time,
+        d.name AS deptName,
+        d.dept_id AS deptId
+    </sql>
+    <select id="getUserVoById" resultMap="userVoResultMap">
+        SELECT
+        <include refid="userRoleDeptSql"/>
+        FROM
+        sys_user AS `user`
+        LEFT JOIN sys_user_org as uo ON user.user_id=uo.user_id
+        LEFT JOIN sys_org_role as oro ON uo.org_id=oro.org_id
+        LEFT JOIN sys_role AS r ON r.role_id = oro.role_id
+        LEFT JOIN sys_dept AS d ON d.dept_id = `user`.dept_id
+        WHERE
+        `user`.user_id = #{id}
+    </select>
+
+    <!--通过用户名，查询含有角色的信息-->
+    <select id="selectUserVoByUserName" resultMap="userVoResultMap">
+        <include refid="selectUserVo"/>
+        WHERE `user`.username = #{username}
+    </select>
+
+
+
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="baseResultMap" type="com.blsq.admin.common.vo.UserVO">
+        <id column="user_id" property="userId"/>
+        <result column="username" property="username"/>
+        <result column="realname" property="realname"/>
+        <result column="mailbox" property="mailbox"/>
+        <result column="identity_card" property="identityCard"/>
+        <result column="password" property="password"/>
+        <result column="salt" property="salt"/>
+        <result column="phone" property="phone"/>
+        <result column="avatar" property="avatar"/>
+        <result column="wx_openid" property="wxOpenid"/>
+        <result column="qq_openid" property="qqOpenid"/>
+        <result column="ucreate_time" property="createTime"/>
+        <result column="uupdate_time" property="updateTime"/>
+        <result column="lock_flag" property="lockFlag"/>
+        <result column="udel_flag" property="delFlag"/>
+        <result column="deptId" property="deptId"/>
+        <result column="tenantId" property="tenantId"/>
+        <result column="deptName" property="deptName"/>
+        <collection property="roleList" ofType="com.blsq.admin.model.SysRole"
+                    select="com.blsq.admin.mapper.SysRoleMapper.listRolesByUserId" column="user_id">
+        </collection>
+
+    </resultMap>
+
+    <select id="getUserVosPage" resultMap="baseResultMap">
+        SELECT
+        `user`.user_id,
+        `user`.username,
+        `user`.`password`,
+         user.realname,
+        user.identity_card,
+        user.mailbox,
+        `user`.salt,
+        `user`.phone,
+        `user`.avatar,
+        `user`.wx_openid,
+        `user`.qq_openid,
+        `user`.dept_id,
+        `user`.create_time AS ucreate_time,
+        `user`.update_time AS uupdate_time,
+        `user`.del_flag AS udel_flag,
+        `user`.lock_flag AS lock_flag,
+        `user`.dept_id AS deptId,
+        `user`.tenant_id AS tenantId
+        FROM
+        sys_user AS `user`
+        LEFT JOIN sys_dept AS d ON d.dept_id = `user`.dept_id
+        <where>
+            <if test="query.username != null and query.username != ''">
+                and `user`.username LIKE CONCAT('%',#{query.username},'%')
+            </if>
+            <if test="query.deptId != null and query.deptId != ''">
+                and `user`.dept_id = #{query.deptId}
+            </if>
+        </where>
+        ORDER BY `user`.create_time DESC
+    </select>
+
+
+    <sql id="userRoleSql">
+        `user`.user_id,
+        `user`.username,
+        `user`.`password`,
+        `user`.salt,
+        `user`.phone,
+        `user`.avatar,
+        `user`.wx_openid,
+        `user`.qq_openid,
+        `user`.dept_id,
+        `user`.create_time AS ucreate_time,
+        `user`.update_time AS uupdate_time,
+        `user`.del_flag AS udel_flag,
+        `user`.lock_flag AS lock_flag,
+        `user`.dept_id AS deptId,
+        `user`.tenant_id AS tenantId,
+        r.role_id,
+        r.role_name,
+        r.role_code,
+        r.role_desc,
+        r.create_time AS rcreate_time,
+        r.update_time AS rupdate_time,
+        o.org_id,
+        o.org_name,
+        o.org_code
+    </sql>
+
+    <select id="getUserVoByUsername" resultMap="userVoResultMap">
+        SELECT
+        <include refid="userRoleSql"/>
+        FROM
+        sys_user AS `user`
+        LEFT JOIN sys_role AS r ON r.role_id = ur.role_id
+        WHERE `user`.username = #{username}
+    </select>
+    <select id="selectUserVoByUserId" resultMap="userVoResultMap">
+        SELECT
+        <include refid="userRoleSql"/>
+        FROM
+        sys_user AS `user`
+        LEFT JOIN sys_role AS r ON r.role_id = ur.role_id
+        LEFT JOIN sys_user_org as uo ON user.user_id=uo.user_id
+        LEFT JOIN sys_org as o ON o.org_id=uo.org_id
+        WHERE `user`.user_id = #{userId}
+    </select>
+
+    <resultMap id="userOrgRoleVoResultMap" type="com.blsq.admin.common.vo.UserOrgRoleVO">
+        <id column="user_id" property="userId"/>
+        <result column="username" property="username"/>
+        <result column="identity_card" property="identityCard"/>
+        <result column="salt" property="salt"/>
+        <result column="realname" property="realname" />
+        <result column="mailbox" property="mailbox" />
+        <result column="phone" property="phone" />
+        <result column="avatar" property="avatar" />
+        <result column="ucreate_time" property="createTime"/>
+        <result column="uupdate_time" property="updateTime"/>
+        <result column="udel_flag" property="delFlag"/>
+        <result column="ulock_flag" property="lockFlag"/>
+        <collection property="roleList" ofType="com.blsq.admin.common.vo.SysRoleVO">
+            <id column="role_id" property="roleId" />
+            <result column="role_name" property="roleName" />
+            <result column="role_code" property="roleCode" />
+            <result column="role_desc" property="roleDesc" />
+        </collection>
+        <collection property="orgList" ofType="com.blsq.admin.model.SysOrg">
+            <id column="org_id" property="orgId" />
+            <result column="org_name" property="orgName" />
+            <result column="org_code" property="orgCode" />
+        </collection>
+    </resultMap>
+
+
+    <sql id="userOrgRoleSql">
+        `user`.user_id,
+        `user`.username,
+         user.realname,
+        `user`.salt,
+        `user`.phone,
+        `user`.avatar,
+         user.identity_card,
+         user.mailbox,
+        `user`.wx_openid,
+        `user`.qq_openid,
+        `user`.dept_id,
+        `user`.create_time AS ucreate_time,
+        `user`.update_time AS uupdate_time,
+        `user`.del_flag AS udel_flag,
+        `user`.lock_flag AS lock_flag,
+        `user`.dept_id AS deptId,
+        `user`.tenant_id AS tenantId,
+        r.role_id,
+        r.role_name,
+        r.role_code,
+        r.role_desc,
+        r.create_time AS rcreate_time,
+        r.update_time AS rupdate_time,
+        so.org_id,
+        so.org_name,
+        so.org_code
+    </sql>
+
+    <select id="setUsersWithOrgPage" resultMap="userOrgRoleVoResultMap">
+      SELECT <include refid="userOrgRoleSql"/> FROM
+    sys_org AS so
+    INNER JOIN sys_org_relation AS re ON so.org_id=re.`descendant` AND re.`ancestor`=#{userOrgRoleDTO.orgId}
+    INNER JOIN sys_user_org AS uo ON uo.org_id=so.org_id
+    INNER JOIN sys_user AS user ON user.user_id=uo.user_id
+    INNER JOIN sys_org_role AS oro ON oro.org_id=so.org_id
+    INNER JOIN sys_role AS r ON oro.role_id=r.role_id
+    </select>
+
+    <select id="getUserByUsername" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from sys_user
+        WHERE username = #{username}
+    </select>
+
+</mapper>
